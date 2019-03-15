@@ -1,3 +1,4 @@
+// GAME CAN BE FOUND AT: https://aprilleperez.github.io/bootstrap-portfolio/portfolio.html
 
 // Initialize Firebase
 var config = {
@@ -10,20 +11,20 @@ var config = {
 };
 firebase.initializeApp(config);
 
-var database = firebase.database();
+var database = firebase.database(); // store database in easy to ref var
 
 
-// 2. Button for adding trains
+// Function for on submit button click
 $("#add-train-btn").on("click", function (event) {
     event.preventDefault();
 
-    // Grabs user input
+    // Grabs user input from each form input
     var trainName = $("#train-name-input").val().trim();
     var trainDestination = $("#destination-input").val().trim();
     var trainTime = moment($("#time-input").val().trim(), "HH:mm").format("X");
     var trainFrequency = $("#frequency-input").val().trim();
 
-    // Creates local "temporary" object for holding train data
+    // Creates local "temporary" object for holding train data from value inputs
     var newTrain = {
         name: trainName,
         destination: trainDestination,
@@ -31,16 +32,8 @@ $("#add-train-btn").on("click", function (event) {
         frequency: trainFrequency
     };
 
-    // Uploads train data to the database
+    // Uploads train object data to the database
     database.ref().push(newTrain);
-
-    // Logs everything to console
-    console.log(newTrain.name);
-    console.log(newTrain.destination);
-    console.log(newTrain.time);
-    console.log(newTrain.frequency);
-
-    alert("Train successfully added");
 
     // Clears all of the text-boxes
     $("#train-name-input").val("");
@@ -51,49 +44,35 @@ $("#add-train-btn").on("click", function (event) {
     event.preventDefault();
 });
 
-// 3. Create Firebase event for adding employee to the database and a row in the html when a user adds an entry
-database.ref().on("child_added", function (childSnapshot) {
-    console.log(childSnapshot.val());
 
-    // Store everything into a variable.
+// Function to create Firebase event adding employee to the database and a row in the html when a user adds an entry
+database.ref().on("child_added", function (childSnapshot) { // when firebase updates at that moment
+
+    // Store everything at that moment into a variable.
     var trainName = childSnapshot.val().name;
     var trainDestination = childSnapshot.val().destination;
     var trainTime = childSnapshot.val().time;
     var trainFrequency = childSnapshot.val().frequency;
 
-    // Employee Info
-    console.log(trainName);
-    console.log(trainDestination);
-    console.log(trainTime);
-    console.log(trainFrequency);
-
     var tFrequency = trainFrequency;
 
     // Converts time from unix time back to wall clock (military) time
     var firstTimeConverted = moment(trainTime, "X");
-    console.log(firstTimeConverted);
 
     // Current Time
     var currentTime = moment();
-    console.log("CURRENT TIME: " + moment(currentTime).format("HH:mm"));
 
     // Difference between the times
     var diffTime = currentTime.diff(moment(firstTimeConverted), "minutes");
-    console.log("DIFFERENCE IN TIME: " + diffTime);
 
     // Time apart (remainder)
     var tRemainder = diffTime % tFrequency;
-    console.log(tRemainder);
 
     // Minutes Until Train
     var tMinutesTillTrain = tFrequency - tRemainder;
-    console.log("MINUTES TILL TRAIN: " + tMinutesTillTrain);
-
-
 
     // Calculate the next train time
     var nextTrain = moment().add(tMinutesTillTrain, "minutes").format("HH:mm");
-    console.log("ARRIVAL TIME: " + nextTrain);
 
     // Create the new row
     var newRow = $("<tr>").append(
@@ -107,3 +86,34 @@ database.ref().on("child_added", function (childSnapshot) {
     // Append the new row to the table
     $("#train-table > tbody").append(newRow);
 });
+
+
+
+
+
+
+
+
+// DEBUGS
+    // // Logs everything to console
+    // console.log(newTrain.name);
+    // console.log(newTrain.destination);
+    // console.log(newTrain.time);
+    // console.log(newTrain.frequency);
+
+    // alert("Train successfully added");
+
+    //  // Train Info
+    //  console.log(trainName);
+    //  console.log(trainDestination);
+    //  console.log(trainTime);
+    //  console.log(trainFrequency);
+
+    // console.log(childSnapshot.val());
+    
+    // console.log(firstTimeConverted);
+    // console.log("CURRENT TIME: " + moment(currentTime).format("HH:mm"));
+    // console.log("DIFFERENCE IN TIME: " + diffTime);
+    // console.log(tRemainder);
+    // console.log("MINUTES TILL TRAIN: " + tMinutesTillTrain);
+    // console.log("ARRIVAL TIME: " + nextTrain);
